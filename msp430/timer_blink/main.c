@@ -1,8 +1,8 @@
 #include <msp430.h>
 
-#include "msp430/launchpad/core.h"
-#include "msp430/launchpad/led.h"
-#include "msp430/launchpad/watchdog.h"
+#include "core.h"
+#include "led.h"
+#include "watchdog.h"
 
 ALWAYS_INLINE void configure_clock() {
   // ACLK sourced from internal VLO, divided by 4 = ~3 kHz.

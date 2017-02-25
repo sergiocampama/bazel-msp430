@@ -1,6 +1,7 @@
 # Default target microcontroller device.
 _DEFAULT_MMCU = "msp430g2553"
 
+# Environment variable containing the compilation mode.
 _COMPILATION_MODE_ENV_VAR = "COMPILATION_MODE"
 
 def _get_mmcu(ctx):
@@ -9,10 +10,16 @@ def _get_mmcu(ctx):
 
 def _get_deps_attr(ctx, attr):
   """Returns the merged set of the given attribute from deps."""
-  files = set()
+  deps = set()
   for x in ctx.attr.deps:
-    files += getattr(x.msp430, attr)
-  return files
+    deps += getattr(x.msp430, attr)
+  return deps
+
+def _get_include_paths(ctx):
+  """Returns the include paths available for this target."""
+  includes = set(["/".join([ctx.label.package, x]) for x in ctx.attr.includes])
+  includes += _get_deps_attr(ctx, "includes")
+  return includes
 
 def _get_obj_file(ctx, src):
   """Returns the obj file for the given src."""
@@ -45,6 +52,10 @@ def _register_compilation_actions(ctx):
   common_compile_args.extend(
       ["-isystem", "tools/msp430/msp430-gcc-support-files/include"]
   )
+
+  for include_path in _get_include_paths(ctx):
+    common_compile_args.extend(["-I", include_path])
+
   common_compile_args.append("-mmcu=%s" % _get_mmcu(ctx))
 
   for src in ctx.files.srcs:
@@ -93,13 +104,21 @@ def _register_runner_action(ctx):
     executable = True,
   )
 
+def _validate_msp43_library(ctx):
+  """Validates msp430_library attribute values."""
+  for include in ctx.attr.includes:
+    if include.startswith("/"):
+      fail("'includes' cannot contain absolute paths.")
+
 def _msp430_library_impl(ctx):
   """Implementation for the msp430_library rule."""
+  _validate_msp43_library(ctx)
   obj_files = _register_compilation_actions(ctx)
 
   return struct(
     msp430 = struct(
       hdrs = _get_deps_attr(ctx, "hdrs") + set(ctx.files.hdrs),
+      includes = _get_include_paths(ctx),
       obj =  _get_deps_attr(ctx, "obj") + set(obj_files),
     ),
     files = obj_files,
@@ -119,6 +138,8 @@ def _msp430_binary_impl(ctx):
 # Attributes:
 #   hdrs: List of headers this target provides.
 #   srcs: List of sources to compile.
+#   includes: List of paths relative to the package that are added as include
+#             paths when compiling.
 #   deps: List of dependencies of type msp430_library for this target.
 #
 # Provides:
@@ -142,6 +163,9 @@ msp430_library = rule(
     ),
     "hdrs": attr.label_list(
       allow_files = [".h"],
+    ),
+    "includes": attr.string_list(
+      default = [],
     ),
     "srcs": attr.label_list(
       allow_files = [".c"],
