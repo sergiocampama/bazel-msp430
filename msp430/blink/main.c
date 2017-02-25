@@ -18,9 +18,9 @@ void main() {
 }
 
 interrupt(PORT1_VECTOR) port1_interrupt_handler() {
-	// If the button was pressed, toggle the LEDs.
-	if (button_interrupted()) {
+  // If the button was pressed, toggle the LEDs.
+  if (button_interrupted()) {
     led_toggle(LED_RED + LED_GREEN);
     button_clear_interrupt();
-	}
+  }
 }

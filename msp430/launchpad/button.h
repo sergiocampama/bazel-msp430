@@ -21,12 +21,12 @@
 ALWAYS_INLINE void button_init() {
   // Enables the pull up resistance for the button.
   BUTTON_REN |= BUTTON;
-	// Detect button on high to low edge.
-	BUTTON_IES |= BUTTON;
+  // Detect button on high to low edge.
+  BUTTON_IES |= BUTTON;
   // Clear the button interrupt.
-	BUTTON_IFG &= ~BUTTON;
+  BUTTON_IFG &= ~BUTTON;
   // Activate the button interrupt.
-	BUTTON_IE |= BUTTON;
+  BUTTON_IE |= BUTTON;
 }
 
 /**

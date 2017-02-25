@@ -1,7 +1,7 @@
 # Default target microcontroller device.
 _DEFAULT_MMCU = "msp430g2553"
 
-_COMPILATION_MODE = "COMPILATION_MODE"
+_COMPILATION_MODE_ENV_VAR = "COMPILATION_MODE"
 
 def _get_mmcu(ctx):
   """Returns target microcontroller device."""
@@ -22,7 +22,7 @@ def _get_obj_file(ctx, src):
 
 def _get_extra_compilation_mode_flags(ctx):
   """Returns additional compilation flags for the current compilation mode."""
-  mode = ctx.var[_COMPILATION_MODE]
+  mode = ctx.var[_COMPILATION_MODE_ENV_VAR]
   if mode != "opt":
     return ["-g"]
   return ["-O3"]

@@ -32,6 +32,6 @@ void main() {
 }
 
 interrupt(TIMER0_A1_VECTOR) timera0_interrupt_handler() {
-	led_toggle(LED_RED + LED_GREEN);
+  led_toggle(LED_RED + LED_GREEN);
   TA0CTL &= ~TAIFG;
 }
