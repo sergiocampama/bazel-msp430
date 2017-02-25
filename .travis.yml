@@ -1,0 +1,8 @@
+language: c
+os:
+  - osx
+osx_image: xcode8.2
+script:
+  - ./tools/msp430/tests/msp430_integration_test.sh
+notifications:
+  email: true
