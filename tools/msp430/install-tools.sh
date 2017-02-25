@@ -3,8 +3,8 @@
 TOOLS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SYMLINK_FOLDER=msp430-gcc
 
-COMPILER_FILES=msp430-gcc-5.3.0.224_osx
-SUPPORT_FILES=msp430-gcc-support-files-1.194.zip
+COMPILER_FILES=msp430-gcc-6.2.1.16_osx
+SUPPORT_FILES=msp430-gcc-support-files-1.198.zip
 
 TMP_MSP430_GCC=/tmp/mspgcc.tar.bz2
 TMP_MSP430_SUPPORT=/tmp/mspgcc-support.zip
