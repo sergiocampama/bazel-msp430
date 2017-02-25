@@ -1,6 +1,8 @@
 MSP430 Bazel Workspace
 ======================
 
+[![Build Status](https://travis-ci.org/sergiocampama/bazel-msp430.svg?branch=master)](https://travis-ci.org/sergiocampama/bazel-msp430)
+
 Author: Sergio Campamá (kaipi)
 
 Date: 12/25/2016
