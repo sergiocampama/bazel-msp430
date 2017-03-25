@@ -44,13 +44,13 @@ def _register_compilation_actions(ctx):
   common_compile_args.extend(_get_extra_compilation_mode_flags(ctx))
   common_compile_args.extend(["-I", "."])
   common_compile_args.extend(
-      ["-isystem", "tools/msp430/msp430-gcc/include"]
+      ["-isystem", "external/msp430_toolchain/include"]
   )
   common_compile_args.extend(
-      ["-isystem", "tools/msp430/msp430-gcc/msp430-elf/include"]
+      ["-isystem", "external/msp430_toolchain/msp430-elf/include"]
   )
   common_compile_args.extend(
-      ["-isystem", "tools/msp430/msp430-gcc-support-files/include"]
+      ["-isystem", "external/msp430_include/include"]
   )
 
   for include_path in _get_include_paths(ctx):
@@ -66,13 +66,19 @@ def _register_compilation_actions(ctx):
     compile_args.append(src.path)
     compile_args.extend(["-o", obj_file.path])
 
+    action_inputs = [src]
+    action_inputs.extend(ctx.files._compiler_support)
+    action_inputs.extend(ctx.files._compiler_include)
+    action_inputs.extend(list(_get_deps_attr(ctx, "hdrs")))
+
+    print(ctx)
+
     ctx.action(
-      inputs = [src] + list(ctx.files.hdrs +
-          ctx.files._compiler_support) + list(_get_deps_attr(ctx, "hdrs")),
-      outputs = [obj_file],
-      mnemonic = "CompileMSP430Source",
-      executable = ctx.executable._compiler,
-      arguments = compile_args,
+        inputs = action_inputs,
+        outputs = [obj_file],
+        mnemonic = "CompileMSP430Source",
+        executable = ctx.executable._compiler,
+        arguments = compile_args,
     )
   return set(obj_files)
 
@@ -83,14 +89,18 @@ def _register_link_action(ctx):
   link_args = [x.path for x in obj_files]
   link_args.append("-mmcu=%s" % _get_mmcu(ctx))
   link_args.extend(["-o", ctx.outputs.binary.path])
-  link_args.extend(["-L", "tools/msp430/msp430-gcc-support-files/include"])
+  link_args.extend(["-L", "external/msp430_include/include"])
+
+  action_inputs = list(obj_files)
+  action_inputs.extend(ctx.files._compiler_support)
+  action_inputs.extend(ctx.files._compiler_include)
 
   ctx.action(
-    inputs = list(obj_files + ctx.files._compiler_support),
-    outputs = [ctx.outputs.binary],
-    mnemonic = "LinkMSP430Binary",
-    executable = ctx.executable._compiler,
-    arguments = link_args,
+      inputs = action_inputs,
+      outputs = [ctx.outputs.binary],
+      mnemonic = "LinkMSP430Binary",
+      executable = ctx.executable._compiler,
+      arguments = link_args,
   )
 
 def _register_runner_action(ctx):
@@ -117,9 +127,9 @@ def _msp430_library_impl(ctx):
 
   return struct(
     msp430 = struct(
-      hdrs = _get_deps_attr(ctx, "hdrs") + set(ctx.files.hdrs),
-      includes = _get_include_paths(ctx),
-      obj =  _get_deps_attr(ctx, "obj") + set(obj_files),
+        hdrs = _get_deps_attr(ctx, "hdrs") + set(ctx.files.hdrs),
+        includes = _get_include_paths(ctx),
+        obj =  _get_deps_attr(ctx, "obj") + set(obj_files),
     ),
     files = obj_files,
   )
@@ -148,32 +158,37 @@ def _msp430_binary_impl(ctx):
 #     obj:  Set of transitive obj files that this target provides and depends
 #           on.
 msp430_library = rule(
-  _msp430_library_impl,
-  attrs = {
-    "_compiler": attr.label(
-      executable = True,
-      cfg = "host",
-      allow_single_file = True,
-      default = Label("//tools/msp430:compiler"),
-    ),
-    "_compiler_support": attr.label(
-      allow_files = True,
-      cfg = "host",
-      default = Label("//tools/msp430:compiler_support"),
-    ),
-    "hdrs": attr.label_list(
-      allow_files = [".h"],
-    ),
-    "includes": attr.string_list(
-      default = [],
-    ),
-    "srcs": attr.label_list(
-      allow_files = [".c"],
-    ),
-    "deps": attr.label_list(
-      providers = [["msp430"]],
-    )
-  },
+    _msp430_library_impl,
+    attrs = {
+        "_compiler": attr.label(
+          executable = True,
+          cfg = "host",
+          allow_single_file = True,
+          default = Label("@msp430_toolchain//:compiler"),
+        ),
+        "_compiler_support": attr.label(
+          allow_files = True,
+          cfg = "host",
+          default = Label("@msp430_toolchain//:compiler_support"),
+        ),
+        "_compiler_include": attr.label(
+          allow_files = True,
+          cfg = "host",
+          default = Label("@msp430_include//:compiler_include"),
+        ),
+        "hdrs": attr.label_list(
+          allow_files = [".h"],
+        ),
+        "includes": attr.string_list(
+          default = [],
+        ),
+        "srcs": attr.label_list(
+          allow_files = [".c"],
+        ),
+        "deps": attr.label_list(
+          providers = [["msp430"]],
+        )
+    },
 )
 
 # Rule that links msp430 obj files into a binary that can be installed in the
@@ -185,25 +200,30 @@ msp430_library = rule(
 #         the transitive set of dependencies will be linked into the final
 #         binary.
 msp430_binary = rule(
-  _msp430_binary_impl,
-  executable = True,
-  attrs = {
-    "_compiler": attr.label(
-      executable = True,
-      cfg = "host",
-      allow_single_file = True,
-      default = Label("//tools/msp430:compiler"),
-    ),
-    "_compiler_support": attr.label(
-      allow_files = True,
-      cfg = "host",
-      default = Label("//tools/msp430:compiler_support"),
-    ),
-    "deps": attr.label_list(
-      providers = [["msp430"]],
-    )
-  },
-  outputs = {
-    "binary": "%{name}_bin",
-  },
+    _msp430_binary_impl,
+    executable = True,
+    attrs = {
+        "_compiler": attr.label(
+          executable = True,
+          cfg = "host",
+          allow_single_file = True,
+          default = Label("@msp430_toolchain//:compiler"),
+        ),
+        "_compiler_support": attr.label(
+          allow_files = True,
+          cfg = "host",
+          default = Label("@msp430_toolchain//:compiler_support"),
+        ),
+        "_compiler_include": attr.label(
+          allow_files = True,
+          cfg = "host",
+          default = Label("@msp430_include//:compiler_include"),
+        ),
+        "deps": attr.label_list(
+          providers = [["msp430"]],
+        )
+    },
+    outputs = {
+        "binary": "%{name}_bin",
+    },
 )
