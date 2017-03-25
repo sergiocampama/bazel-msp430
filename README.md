@@ -32,8 +32,8 @@ On your `WORKSPACE` file, add the following:
 ```
 git_repository(
     name = "msp430_rules",
-    remote = "",
-    tag = "",
+    remote = "https://github.com/sergiocampama/bazel-msp430.git",
+    tag = "v1.0",
 )
 ```
 
