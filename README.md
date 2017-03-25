@@ -27,9 +27,25 @@ Dependencies (macOS)
 Installation (macOS)
 -------------------
 
-Once you have the dependencies installed, run the `install-tools.sh` script
-inside `tools/msp430`. This will fetch the compiler and support files needed for
-compilation and linking.
+On your `WORKSPACE` file, add the following:
+
+```
+git_repository(
+    name = "msp430_rules",
+    remote = "",
+    tag = "",
+)
+```
+
+Once that is set, you can load the Skylark files in your BUILD file using
+
+```
+load(
+    "@msp430_rules//tools/msp430:build_defs/msp430.bzl",
+    "msp430_library",
+    "msp430_binary",
+)
+```
 
 Usage
 -----

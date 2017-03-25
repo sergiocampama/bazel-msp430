@@ -1,0 +1,9 @@
+# BUILD file for the msp430 include archive.
+
+filegroup(
+    name = "compiler_include",
+    srcs = glob([
+        "include/*",
+    ]),
+    visibility = ["//visibility:public"],
+)

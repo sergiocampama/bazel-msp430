@@ -1,5 +1,2 @@
 **/.DS_Store
 bazel-*
-tools/msp430/msp430-gcc
-tools/msp430/msp430-gcc-*
-tools/msp430/msp430-gcc-support-files

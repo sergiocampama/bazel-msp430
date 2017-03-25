@@ -1,0 +1,19 @@
+# BUILD file for the msp430 toolchain archive.
+
+filegroup(
+    name = "compiler",
+    srcs = ["bin/msp430-elf-gcc"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "compiler_support",
+    srcs = glob([
+        "bin/**/*",
+        "include/**/*",
+        "lib/**/*",
+        "libexec/**/*",
+        "msp430-elf/**/*",
+    ]),
+    visibility = ["//visibility:public"],
+)
