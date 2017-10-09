@@ -5,7 +5,7 @@ brew update
 brew install bazel
 
 echo "Running test..."
-bazel build //tools/msp430/tests:test_bin
+bazel build //tools/msp430/tests:test_bin -s
 
 echo "Test successful!"
 

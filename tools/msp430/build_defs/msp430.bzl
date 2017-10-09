@@ -10,14 +10,14 @@ def _get_mmcu(ctx):
 
 def _get_deps_attr(ctx, attr):
   """Returns the merged set of the given attribute from deps."""
-  deps = set()
+  deps = depset()
   for x in ctx.attr.deps:
     deps += getattr(x.msp430, attr)
   return deps
 
 def _get_include_paths(ctx):
   """Returns the include paths available for this target."""
-  includes = set(["/".join([ctx.label.package, x]) for x in ctx.attr.includes])
+  includes = depset(["/".join([ctx.label.package, x]) for x in ctx.attr.includes])
   includes += _get_deps_attr(ctx, "includes")
   return includes
 
@@ -50,7 +50,7 @@ def _register_compilation_actions(ctx):
       ["-isystem", "external/msp430_toolchain/msp430-elf/include"]
   )
   common_compile_args.extend(
-      ["-isystem", "external/msp430_include/include"]
+      ["-I", "external/msp430_include/include"]
   )
 
   for include_path in _get_include_paths(ctx):
@@ -80,7 +80,7 @@ def _register_compilation_actions(ctx):
         executable = ctx.executable._compiler,
         arguments = compile_args,
     )
-  return set(obj_files)
+  return depset(obj_files)
 
 def _register_link_action(ctx):
   """Registers the link action for the binary."""
@@ -127,9 +127,9 @@ def _msp430_library_impl(ctx):
 
   return struct(
     msp430 = struct(
-        hdrs = _get_deps_attr(ctx, "hdrs") + set(ctx.files.hdrs),
+        hdrs = _get_deps_attr(ctx, "hdrs") + depset(ctx.files.hdrs),
         includes = _get_include_paths(ctx),
-        obj =  _get_deps_attr(ctx, "obj") + set(obj_files),
+        obj =  _get_deps_attr(ctx, "obj") + depset(obj_files),
     ),
     files = obj_files,
   )
