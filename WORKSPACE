@@ -15,9 +15,9 @@ new_http_archive(
 new_http_archive(
     name = "msp430_include",
     build_file = "BUILD.msp430_include",
-    sha256 = "e73caf009be6966160d6b8e3f65e1af6ca4221ba335a01dbcf3fa537dbfb406d",
+    sha256 = "401630dbaad23db17ad2edfba31a16f4a1fd1588e131140b5ca3a416b7534e11",
     strip_prefix = "msp430-gcc-support-files",
     urls = [
-        "http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/exports/msp430-gcc-support-files-1.203.zip",
+        "http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/exports/msp430-gcc-support-files-1.204.zip",
     ],
 )
