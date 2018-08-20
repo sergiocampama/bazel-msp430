@@ -1,7 +1,7 @@
 language: c
 os:
   - osx
-osx_image: xcode8.2
+osx_image: xcode9.4
 script:
   - ./tools/msp430/tests/msp430_integration_test.sh
 notifications:
