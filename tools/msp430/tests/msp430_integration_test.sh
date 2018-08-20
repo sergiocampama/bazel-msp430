@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+echo "Installing Java dependencies..."
+brew cask install homebrew/cask-versions/java8
+
 echo "Installing bazel..."
 brew update
 brew install bazel
