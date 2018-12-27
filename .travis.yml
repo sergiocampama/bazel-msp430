@@ -6,3 +6,11 @@ script:
   - ./tools/msp430/tests/msp430_integration_test.sh
 notifications:
   email: true
+  webhooks:
+    urls:
+      - https://us-central1-apple-bots.cloudfunctions.net/TravisCIBot
+    on_success: always # default: always
+    on_failure: always # default: always
+    on_start: always # default: never
+    on_cancel: always # default: always
+    on_error: always # default: always
