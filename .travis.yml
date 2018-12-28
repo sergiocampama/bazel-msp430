@@ -8,7 +8,7 @@ notifications:
   email: true
   webhooks:
     urls:
-      - https://us-central1-apple-bots.cloudfunctions.net/TravisCIBot
+      - https://us-central1-apple-bots.cloudfunctions.net/travis_ci_webhook
     on_success: always # default: always
     on_failure: always # default: always
     on_start: always # default: never
